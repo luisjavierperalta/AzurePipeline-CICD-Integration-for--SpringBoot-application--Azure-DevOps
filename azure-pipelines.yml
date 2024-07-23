@@ -1,0 +1,31 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main  # Set the branch that triggers the pipeline
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image for the build environment
+
+steps:
+- task: UseJavaVersion@1
+  inputs:
+    versionSpec: '11'  # Use Java 11 for the build
+    jdkArchitecture: 'x64'
+  displayName: 'Set up JDK 11'
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'  # Path to your Maven POM file
+    goals: 'clean package'  # Maven goals to clean and package the application
+    options: '-DskipTests=true'  # Skip tests during the build (change as needed)
+  displayName: 'Build with Maven'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/target'  # Path to the build artifacts
+    ArtifactName: 'drop'  # Name of the artifact to publish
+    publishLocation: 'Container'  # Publish artifacts to the pipeline artifact container
+  displayName: 'Publish Build Artifacts'
