@@ -10,11 +10,10 @@ pool:
   vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image for the build environment
 
 steps:
-- task: UseJavaVersion@1
-  inputs:
-    versionSpec: '11'  # Use Java 11 for the build
-    jdkArchitecture: 'x64'
-  displayName: 'Set up JDK 11'
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y openjdk-11-jdk
+  displayName: 'Install JDK 11'
 
 - task: Maven@3
   inputs:
