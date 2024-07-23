@@ -9,33 +9,18 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'  # Use the latest Ubuntu image for the build environment
 
-jobs:
-- job: InstallJDK
-  displayName: 'Install JDK 11'
-  steps:
-  - script: |
-      sudo apt-get update
-      sudo apt-get install -y openjdk-11-jdk
-    displayName: 'Install JDK 11'
+steps:
 
-- job: BuildWithMaven
-  dependsOn: InstallJDK
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'  # Path to your Maven POM file
+    goals: 'clean package'  # Maven goals to clean and package the application
+    options: '-DskipTests=true'  # Skip tests during the build (change as needed)
   displayName: 'Build with Maven'
-  steps:
-  - task: Maven@3
-    inputs:
-      mavenPomFile: 'pom.xml'  # Path to your Maven POM file
-      goals: 'clean package'  # Maven goals to clean and package the application
-      options: '-DskipTests=true'  # Skip tests during the build (change as needed)
-    displayName: 'Build with Maven'
 
-- job: PublishArtifacts
-  dependsOn: BuildWithMaven
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/target'  # Path to the build artifacts
+    ArtifactName: 'drop'  # Name of the artifact to publish
+    publishLocation: 'Container'  # Publish artifacts to the pipeline artifact container
   displayName: 'Publish Build Artifacts'
-  steps:
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/target'  # Path to the build artifacts
-      ArtifactName: 'drop'  # Name of the artifact to publish
-      publishLocation: 'Container'  # Publish artifacts to the pipeline artifact container
-    displayName: 'Publish Build Artifacts'
